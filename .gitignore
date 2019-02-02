@@ -2,3 +2,4 @@ src/bin/**/*
 src/obj/**/*
 FastMapper.UnitTest/bin/**/*
 FastMapper.UnitTest/obj/**/*
+.vs/**/*
