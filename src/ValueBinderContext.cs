@@ -1,6 +1,6 @@
 ﻿namespace FastMapper
 {
-  public class ValueBinderContext
+  public struct ValueBinderContext
   {
     public ValueBinderContext(object source, object result, TargetConfiguration targetConfiguration, ValueProvider valueProvider, IObjectMapper objectMapper)
     {
