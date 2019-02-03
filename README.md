@@ -1,7 +1,7 @@
 # FastMapper
 ![Image of Yaktocat](https://ci.appveyor.com/api/projects/status/dxqgnl1kfbabenv2?svg=true)
 
-Allows mapping between two objects.  Based on FastMember library.
+Allows mapping between two objects.  Uses [FastMember](https://github.com/mgravell/fast-member) library.
 ```
 dynamic result = DataProvider.QueryDynamic(select).FirstOrDefault();
 return ObjectMapper.Map<ViewModel>(result);
