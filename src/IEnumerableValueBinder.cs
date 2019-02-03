@@ -63,14 +63,17 @@ namespace FastMapper
 
       Type enumerableType = type.GenericTypeArguments.FirstOrDefault();
 
-      if (TryFindResolvedType(enumerableType, targetConfiguration, out Type resolvedType))
+      if (enumerableType != null)
       {
-        return resolvedType;
-      }
+        if (TryFindResolvedType(enumerableType, targetConfiguration, out Type resolvedType))
+        {
+          return resolvedType;
+        }
 
-      if (!enumerableType.IsAbstract)
-      {
-        return enumerableType;
+        if (!enumerableType.IsAbstract)
+        {
+          return enumerableType;
+        }
       }
 
       return null;
