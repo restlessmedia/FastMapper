@@ -31,7 +31,7 @@ namespace FastMapper
 
           if (valueBinderContext.ValueProvider.TryGetValue(valueBinderContext.Source, name, out object value) && value != null)
           {
-            ValueConverter valueConverter = Configuration.ValueConverters.FirstOrDefault(x => x.CanConvert(targetMember.Type));
+            ValueConverter valueConverter = Configuration.ValueConverters.First(x => x.CanConvert(targetMember.Type));
             value = valueConverter.Convert(value, targetMember.Type);
             targetAccessor[valueBinderContext.Result, targetMember.Name] = value;
           }
