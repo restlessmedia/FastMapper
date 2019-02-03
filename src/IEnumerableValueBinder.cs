@@ -12,7 +12,7 @@ namespace FastMapper
 
     public override bool CanBind(Type targetMemberType)
     {
-      return targetMemberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(targetMemberType);
+            return false; // targetMemberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(targetMemberType);
     }
 
     public override void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext)
