@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastMapper", "src\FastMappe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastMapper.UnitTest", "FastMapper.UnitTest\FastMapper.UnitTest.csproj", "{28F30C28-0E8A-431E-AF28-3C8324D431E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FastMapper.Benchmark", "FastMapper.Benchmark\FastMapper.Benchmark.csproj", "{7D585F03-10BE-45FC-BFA5-CB8002E27CED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{28F30C28-0E8A-431E-AF28-3C8324D431E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28F30C28-0E8A-431E-AF28-3C8324D431E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28F30C28-0E8A-431E-AF28-3C8324D431E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D585F03-10BE-45FC-BFA5-CB8002E27CED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D585F03-10BE-45FC-BFA5-CB8002E27CED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D585F03-10BE-45FC-BFA5-CB8002E27CED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D585F03-10BE-45FC-BFA5-CB8002E27CED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

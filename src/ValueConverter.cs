@@ -23,11 +23,6 @@ namespace FastMapper
     /// <returns></returns>
     public static Type GetNullableTypeOrType(Type type)
     {
-      if (!type.IsGenericType)
-      {
-        return type;
-      }
-
       return Nullable.GetUnderlyingType(type) ?? type;
     }
   }

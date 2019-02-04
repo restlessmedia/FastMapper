@@ -2,6 +2,8 @@ src/bin/**/*
 src/obj/**/*
 FastMapper.UnitTest/bin/**/*
 FastMapper.UnitTest/obj/**/*
+FastMapper.Benchmark/bin/**/*
+FastMapper.Benchmark/obj/**/*
 .vs/**/*
 packages/**/*
 .DS_Store

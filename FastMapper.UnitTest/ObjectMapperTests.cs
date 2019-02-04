@@ -211,6 +211,40 @@ namespace FastMapper.UnitTest
 
       property.NullableInt.MustEqual(data.Id);
     }
+
+    [TestMethod]
+    public void map_converts_from_string()
+    {
+      dynamic data = new
+      {
+        Id = "9"
+      };
+
+      Property property = ObjectMapper.Map<Property>(data);
+
+      property.Id.MustEqual(9);
+    }
+
+    [TestMethod]
+    public void mapall_maps_all_items()
+    {
+      dynamic data = new[] {
+        new
+        {
+          Id = 1
+        },
+        new
+        {
+          Id = 2
+        },
+      };
+
+      IEnumerable<Property> properties = ObjectMapper.MapAll<Property>(data);
+
+      properties.Count().MustEqual(2);
+      properties.First().Id.MustEqual(1);
+      properties.Skip(1).First().Id.MustEqual(2);
+    }
   }
 
   public enum Types

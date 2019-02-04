@@ -18,23 +18,17 @@ namespace FastMapper
     {
       if (TryFindResolvedType(targetMember.Type, valueBinderContext.TargetConfiguration, out Type resolvedType))
       {
-        using (new Profiler($"Bind {targetMember.Name} from resolved type map"))
-        {
-          targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueBinderContext.TargetConfiguration);
-        }
+        targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueBinderContext.TargetConfiguration);
       }
       else
       {
-        using (new Profiler($"Bind {targetMember.Name} from source"))
-        {
-          string name = GetSourceNameOrDefault(targetMember, valueBinderContext.TargetConfiguration);
+        string name = GetSourceNameOrDefault(targetMember, valueBinderContext.TargetConfiguration);
 
-          if (valueBinderContext.ValueProvider.TryGetValue(valueBinderContext.Source, name, out object value) && value != null)
-          {
-            ValueConverter valueConverter = Configuration.ValueConverters.First(x => x.CanConvert(targetMember.Type));
-            value = valueConverter.Convert(value, targetMember.Type);
-            targetAccessor[valueBinderContext.Result, targetMember.Name] = value;
-          }
+        if (valueBinderContext.ValueProvider.TryGetValue(valueBinderContext.Source, name, out object value) && value != null)
+        {
+          ValueConverter valueConverter = Configuration.ValueConverters.First(x => x.CanConvert(targetMember.Type));
+          value = valueConverter.Convert(value, targetMember.Type);
+          targetAccessor[valueBinderContext.Result, targetMember.Name] = value;
         }
       }
     }

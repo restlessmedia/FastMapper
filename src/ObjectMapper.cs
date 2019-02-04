@@ -15,6 +15,11 @@ namespace FastMapper
 
     public object Map(Type type, object source, TargetConfiguration targetConfiguration = null)
     {
+      if (source == null)
+      {
+        return null;
+      }
+
       ValueProvider valueProvider = _configuration.ValueProviders.First(x => x.CanRead(source));
       return Map(type, source, valueProvider, targetConfiguration);
     }
@@ -132,6 +137,13 @@ namespace FastMapper
       return (TTarget)objectMapper.Map(targetType, source, targetConfiguration);
     }
 
+    /// <summary>
+    /// Maps all sources to target type.
+    /// </summary>
+    /// <typeparam name="TTarget"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="targetConfiguration"></param>
+    /// <returns></returns>
     public static IEnumerable<TTarget> MapAll<TTarget>(IEnumerable source, TargetConfiguration targetConfiguration = null)
     {
       foreach (object obj in source)
