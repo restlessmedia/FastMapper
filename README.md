@@ -1,5 +1,5 @@
 # FastMapper
-![Image of Yaktocat](https://ci.appveyor.com/api/projects/status/dxqgnl1kfbabenv2?svg=true)
+[![Image of Yaktocat](https://ci.appveyor.com/api/projects/status/dxqgnl1kfbabenv2?svg=true)](https://ci.appveyor.com/project/restlessmedia/fastmapper)
 
 Allows mapping between two objects.  Uses [FastMember](https://github.com/mgravell/fast-member) library.
 ```
