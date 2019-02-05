@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace FastMapper
@@ -7,7 +8,7 @@ namespace FastMapper
   {
     public Configuration()
     {
-      TargetConfigurations = new Dictionary<Type, TargetConfiguration>();
+      TargetConfigurations = new Dictionary<Type, TargetConfiguration>(0);
       ValueProviders = new ValueProvider[]
       {
         new DictionaryValueProvider(),
