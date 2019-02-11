@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>FastMapper</id>
-    <version>1.1</version>
+    <version>1.1.1</version>
     <title>FastMapper object mapper</title>
     <authors>Phil Cooper</authors>
     <owners>Phil Cooper</owners>

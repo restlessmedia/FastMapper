@@ -7,3 +7,4 @@ FastMapper.Benchmark/obj/**/*
 .vs/**/*
 packages/**/*
 .DS_Store
+Nuget.Config

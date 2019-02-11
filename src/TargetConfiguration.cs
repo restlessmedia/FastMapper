@@ -11,22 +11,30 @@ namespace FastMapper
     public TargetConfiguration(TargetConfiguration existingConfiguration)
       : base(existingConfiguration) { }
 
-    public TargetConfiguration() { }
+    public TargetConfiguration()
+      : base() { }
 
     public new MemberConfiguration<TSource, TTarget, TMember> For<TMember>(Expression<Func<TTarget, TMember>> expression)
     {
       MemberConfiguration<TSource, TTarget, TMember> memberConfiguration = new MemberConfiguration<TSource, TTarget, TMember>(expression);
-      AddMemberConfiguration(memberConfiguration);
+
+      if (TryGet(memberConfiguration, out MemberConfiguration existingMemberConfiguration))
+      {
+        return new MemberConfiguration<TSource, TTarget, TMember>(existingMemberConfiguration);
+      }
+
       return memberConfiguration;
     }
   }
+
 
   public class TargetConfiguration<TTarget> : TargetConfiguration
   {
     public TargetConfiguration(TargetConfiguration existingConfiguration)
       : base(existingConfiguration) { }
 
-    public TargetConfiguration() { }
+    public TargetConfiguration()
+      : base() { }
 
     public virtual CollectionMemberConfiguration<TTarget, TMember> ForEach<TMember>(Expression<Func<TTarget, TMember>> expression)
       where TMember : IEnumerable
@@ -37,14 +45,24 @@ namespace FastMapper
       }
 
       CollectionMemberConfiguration<TTarget, TMember> collectionMemberConfiguration = new CollectionMemberConfiguration<TTarget, TMember>(expression);
-      AddMemberConfiguration(collectionMemberConfiguration);
+
+      if (TryGet(collectionMemberConfiguration, out MemberConfiguration existingMemberConfiguration))
+      {
+        return new CollectionMemberConfiguration<TTarget, TMember>(existingMemberConfiguration);
+      }
+
       return collectionMemberConfiguration;
     }
 
     public virtual MemberConfiguration<TTarget, TMember> For<TMember>(Expression<Func<TTarget, TMember>> expression)
     {
       MemberConfiguration<TTarget, TMember> memberConfiguration = new MemberConfiguration<TTarget, TMember>(expression);
-      AddMemberConfiguration(memberConfiguration);
+
+      if (TryGet(memberConfiguration, out MemberConfiguration existingMemberConfiguration))
+      {
+        return new MemberConfiguration<TTarget, TMember>(existingMemberConfiguration);
+      }
+
       return memberConfiguration;
     }
   }
@@ -53,22 +71,27 @@ namespace FastMapper
   {
     public TargetConfiguration(TargetConfiguration existingConfiguration)
     {
-      _configurations = existingConfiguration._configurations;
+      MemberConfigurations = existingConfiguration.MemberConfigurations;
     }
 
     public TargetConfiguration()
     {
-      _configurations = new Dictionary<MemberInfo, MemberConfiguration>(0);
+      MemberConfigurations = new Dictionary<MemberInfo, MemberConfiguration>(0);
     }
 
-    internal void AddMemberConfiguration(MemberConfiguration memberConfiguration)
+    protected bool TryGet(MemberConfiguration memberConfiguration, out MemberConfiguration existingMemberConfiguration)
     {
-      _configurations.Add(memberConfiguration.Member, memberConfiguration);
+      if (!MemberConfigurations.TryGetValue(memberConfiguration.Member, out existingMemberConfiguration))
+      {
+        MemberConfigurations.Add(memberConfiguration.Member, memberConfiguration);
+        return false;
+      }
+      return true;
     }
 
     internal IEnumerable<TypeResolver> GetTypeResolvers()
     {
-      foreach (MemberConfiguration memberConfiguration in _configurations.Values)
+      foreach (MemberConfiguration memberConfiguration in MemberConfigurations.Values)
       {
         foreach (TypeResolver typeResolver in memberConfiguration.TypeResolvers)
         {
@@ -79,7 +102,7 @@ namespace FastMapper
 
     internal IEnumerable<MemberMap> GetMemberMaps()
     {
-      foreach (MemberConfiguration memberConfiguration in _configurations.Values)
+      foreach (MemberConfiguration memberConfiguration in MemberConfigurations.Values)
       {
         foreach (MemberMap memberMap in memberConfiguration.Maps)
         {
@@ -88,6 +111,6 @@ namespace FastMapper
       }
     }
 
-    private readonly Dictionary<MemberInfo, MemberConfiguration> _configurations;
+    protected readonly Dictionary<MemberInfo, MemberConfiguration> MemberConfigurations;
   }
 }

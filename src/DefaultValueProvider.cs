@@ -14,8 +14,7 @@ namespace FastMapper
     {
       TypeAccessor sourceAccessor = TypeAccessor.Create(source.GetType());
       MemberSet sourceMembers = sourceAccessor.GetMembers();
-      // TODO: check why we can't call x.CanRead to only find source members we can read from
-      Member sourceMember = sourceMembers.FirstOrDefault(x => string.Equals(x.Name, name));
+      Member sourceMember = sourceMembers.FirstOrDefault(x => x.CanRead && string.Equals(x.Name, name));
       value = null;
 
       if (sourceMember == null)

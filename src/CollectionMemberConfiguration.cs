@@ -8,6 +8,9 @@ namespace FastMapper
   public class CollectionMemberConfiguration<TTarget, TMember> : MemberConfiguration<TTarget, TMember>
     where TMember : IEnumerable
   {
+    public CollectionMemberConfiguration(MemberConfiguration existingMemberConfiguration)
+      : base(existingMemberConfiguration) { }
+
     public CollectionMemberConfiguration(Expression<Func<TTarget, TMember>> expression)
       : base(expression) { }
 

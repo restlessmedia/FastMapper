@@ -10,6 +10,9 @@ namespace FastMapper
     public MemberConfiguration(Expression<Func<TTarget, TMember>> expression)
       : base(expression) { }
 
+    public MemberConfiguration(MemberConfiguration existingMemberConfiguration)
+      : base(existingMemberConfiguration) { }
+
     public void MapFrom(string sourceMemberName)
     {
       Maps.Add(new MemberMap(sourceMemberName, Member.Name));
@@ -26,6 +29,9 @@ namespace FastMapper
   {
     public MemberConfiguration(Expression<Func<TTarget, TMember>> expression)
       : base(GetMember(expression)) { }
+
+    public MemberConfiguration(MemberConfiguration existingMemberConfiguration)
+      : base(existingMemberConfiguration) { }
 
     public virtual TypeResolver<TMember, TResolvedWith> ResolveWith<TResolvedWith>()
     {
@@ -56,11 +62,18 @@ namespace FastMapper
 
   public class MemberConfiguration
   {
+    public MemberConfiguration(MemberConfiguration existingMemberConfiguration)
+    {
+      Member = existingMemberConfiguration.Member;
+      TypeResolvers = existingMemberConfiguration.TypeResolvers;
+      Maps = existingMemberConfiguration.Maps;
+    }
+
     public MemberConfiguration(MemberInfo member)
     {
       Member = member;
-      TypeResolvers = new List<TypeResolver>();
-      Maps = new List<MemberMap>();
+      TypeResolvers = new List<TypeResolver>(0);
+      Maps = new List<MemberMap>(0);
     }
 
     internal readonly MemberInfo Member;

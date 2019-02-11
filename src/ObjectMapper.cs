@@ -46,6 +46,11 @@ namespace FastMapper
 
     public IEnumerable MapAll(Type type, IEnumerable source, TargetConfiguration targetConfiguration = null)
     {
+      if (source == null)
+      {
+        yield return null;
+      }
+
       foreach (object obj in source)
       {
         yield return Map(type, obj, targetConfiguration);
@@ -88,25 +93,7 @@ namespace FastMapper
         return default(TTarget);
       }
 
-      TargetConfiguration<TSource, TTarget> targetConfiguration = null;
-
-      if (targetConfigurationFactory != null)
-      {
-        Type targetType = typeof(TTarget);
-        TargetConfiguration existingConfiguration;
-
-        if (Configuration.Current.TargetConfigurations.TryGetValue(targetType, out existingConfiguration))
-        {
-          targetConfiguration = new TargetConfiguration<TSource, TTarget>(existingConfiguration);
-        }
-        else
-        {
-          targetConfiguration = new TargetConfiguration<TSource, TTarget>();
-          Configuration.Current.TargetConfigurations[targetType] = targetConfiguration;
-        }
-
-        targetConfigurationFactory(targetConfiguration);
-      }
+      TargetConfiguration<TSource, TTarget> targetConfiguration = GetTargetConfiguration(targetConfigurationFactory);
 
       return Map<TTarget>(source, targetConfiguration);
     }
@@ -150,6 +137,50 @@ namespace FastMapper
       {
         yield return Map<TTarget>(obj, targetConfiguration);
       }
+    }
+
+    public static IEnumerable<TTarget> MapAll<TSource, TTarget>(IEnumerable source, Action<TargetConfiguration<TSource, TTarget>> targetConfigurationFactory = null)
+    {
+      if (source == null)
+      {
+        return Enumerable.Empty<TTarget>();
+      }
+
+      TargetConfiguration<TSource, TTarget> targetConfiguration = GetTargetConfiguration(targetConfigurationFactory);
+
+      return MapAll<TTarget>(source, targetConfiguration);
+    }
+
+    /// <summary>
+    /// If a factory is passed will look for existing configurations or create a new one then invoke.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TTarget"></typeparam>
+    /// <param name="targetConfigurationFactory"></param>
+    /// <returns></returns>
+    private static TargetConfiguration<TSource, TTarget> GetTargetConfiguration<TSource, TTarget>(Action<TargetConfiguration<TSource, TTarget>> targetConfigurationFactory = null)
+    {
+      TargetConfiguration<TSource, TTarget> targetConfiguration = null;
+
+      if (targetConfigurationFactory != null)
+      {
+        Type targetType = typeof(TTarget);
+        Configuration configuration = Configuration.Current;
+
+        if (configuration.TargetConfigurations.TryGetValue(targetType, out TargetConfiguration existingConfiguration))
+        {
+          targetConfiguration = new TargetConfiguration<TSource, TTarget>(existingConfiguration);
+        }
+        else
+        {
+          targetConfiguration = new TargetConfiguration<TSource, TTarget>();
+          configuration.TargetConfigurations[targetType] = targetConfiguration;
+        }
+
+        targetConfigurationFactory(targetConfiguration);
+      }
+
+      return targetConfiguration;
     }
 
     private readonly Configuration _configuration;

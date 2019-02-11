@@ -245,6 +245,30 @@ namespace FastMapper.UnitTest
       properties.First().Id.MustEqual(1);
       properties.Skip(1).First().Id.MustEqual(2);
     }
+
+    [TestMethod]
+    public void mapall_maps_all_items_allowing_configuration()
+    {
+      var data = new[] {
+        new
+        {
+          Id = 4
+        },
+        new
+        {
+          Id = 5
+        },
+      };
+
+      IEnumerable<Property> properties = ObjectMapper.MapAll<dynamic, Property>(data, config =>
+      {
+        config.For(x => x.NullableInt).MapFrom("Id");
+      });
+
+      properties.Count().MustEqual(2);
+      properties.First().NullableInt.MustEqual(4);
+      properties.Skip(1).First().NullableInt.MustEqual(5);
+    }
   }
 
   public enum Types
