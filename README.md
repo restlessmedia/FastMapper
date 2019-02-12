@@ -4,6 +4,14 @@
 
 Colleciton of classes to aid building SQL queries.
 ```
+private class DataModel
+{
+      public int Id { get; set; }
+      
+      [OrderBy]
+      public string Title { get; set; }
+}
+
 Select<DataModel> select = new Select<DataModel>();
       select.Where(x => x.Title, "fooBar");
       select.Sql().MustEqual("select Id,Title from dbo.DataModel where Title=@p0 order by Title");
