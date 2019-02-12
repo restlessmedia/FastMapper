@@ -1,20 +1,29 @@
 # FastMapper
-[![Image of Yaktocat](https://ci.appveyor.com/api/projects/status/rpfycctymokj7t6v/branch/master?svg=true
-)](https://ci.appveyor.com/project/restlessmedia/sqlbuilder)
+[![Image of Yaktocat](https://ci.appveyor.com/api/projects/status/dxqgnl1kfbabenv2?svg=true)](https://ci.appveyor.com/project/restlessmedia/fastmapper)
 
-Colleciton of classes to aid building SQL queries.
+Allows mapping between two objects.  Uses [FastMember](https://github.com/mgravell/fast-member) library.
 ```
-private class DataModel
+dynamic result = DataProvider.QueryDynamic(select).FirstOrDefault();
+return ObjectMapper.Map<ViewModel>(result);
+```
+Configuration can be done for abstract types:
+```
+ObjectMapper.Init(config =>
 {
-      public int Id { get; set; }
-      
-      [OrderBy]
-      public string Title { get; set; }
-}
+  config.Add<ViewModel>(targetConfig => targetConfig.For(x => x.Address).ResolveWith<Address>());
+});
+```
+Configuration can also be done inline when mapping:
+```
+SourceProperty data = new SourceProperty
+{
+  PostCode = "nw10 7nz",
+};
 
-Select<DataModel> select = new Select<DataModel>();
-      select.Where(x => x.Title, "fooBar");
-      select.Sql().MustEqual("select Id,Title from dbo.DataModel where Title=@p0 order by Title");
-      select.Parameters.Count.MustEqual(1);
-      select.Parameters["@p0"].MustEqual("fooBar");
+Property property = ObjectMapper.Map<SourceProperty, Property>(data, config =>
+{
+  config.For(x => x.MapFromTest).MapFrom(x => x.PostCode);
+});
+
+property.MapFromTest.MustEqual(data.PostCode);
 ```
