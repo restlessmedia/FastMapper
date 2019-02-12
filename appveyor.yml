@@ -1,0 +1,17 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+nuget:
+  project_feed: true
+before_build:
+- cmd: nuget restore
+build:
+  publish_nuget: true
+  include_nuget_references: true
+  verbosity: minimal
+after_test:
+- ps: >-
+    $env:PATH = 'C:\msys64\usr\bin;' + $env:PATH
+
+    Invoke-WebRequest -Uri 'https://codecov.io/bash' -OutFile codecov.sh
+
+    bash codecov.sh -f "coverage.xml" -t d93e8440-732b-4bef-9cf3-3476578be1b1
