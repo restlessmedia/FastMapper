@@ -67,6 +67,7 @@
     <Compile Include="ValueProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FastMapper.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
