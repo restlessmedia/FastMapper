@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>FastMapper</id>
-    <version>1.3.0</version>
-    <title>FastMapper object mapper</title>
+    <id>$title$</id>
+    <version>$version$</version>
+    <title>$title$</title>
     <authors>Phil Cooper</authors>
     <owners>Phil Cooper</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
