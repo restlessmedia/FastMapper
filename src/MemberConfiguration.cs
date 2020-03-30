@@ -15,7 +15,7 @@ namespace FastMapper
 
     public void MapFrom(string sourceMemberName)
     {
-      Maps.Add(new MemberMap(sourceMemberName, Member.Name));
+      Maps.Add(new MemberMap(sourceMemberName, Member));
     }
 
     public void MapFrom<TMapToMember>(Expression<Func<TSource, TMapToMember>> expression)

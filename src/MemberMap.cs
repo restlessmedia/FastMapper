@@ -4,14 +4,22 @@ namespace FastMapper
 {
   internal struct MemberMap
   {
-    public MemberMap(string sourceMemberName, string targetMemberName)
+    public MemberMap(string sourceMemberName, MemberInfo member)
     {
       SourceMemberName = sourceMemberName;
-      TargetMemberName = targetMemberName;
+      _member = member;
     }
 
     public readonly string SourceMemberName;
 
-    public readonly string TargetMemberName;
+    public string TargetMemberName
+    {
+      get
+      {
+        return _member.Name;
+      }
+    }
+
+    private readonly MemberInfo _member;
   }
 }

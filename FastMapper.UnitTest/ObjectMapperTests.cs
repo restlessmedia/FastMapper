@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 
@@ -10,13 +9,19 @@ namespace FastMapper.UnitTest
   [TestClass]
   public class ObjectMapperTests
   {
-    [AssemblyInitialize]
-    public static void Init(TestContext testingContext)
+    [TestInitialize]
+    public void TestInitialize()
     {
       ObjectMapper.Init(config =>
       {
         config.Add<Property>(targetConfig => targetConfig.For(x => x.Address).ResolveWith<Address>());
       });
+    }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+      Configuration.Current.Clear();
     }
 
     [TestMethod]
@@ -29,7 +34,7 @@ namespace FastMapper.UnitTest
       data.PostCode = "PostCode";
       data.NotThis = "ignore";
 
-      Profiler.All("map", 10, () => ObjectMapper.Map<Property>(data));
+      Profiler.All("map", 100000, () => ObjectMapper.Map<Property>(data));
     }
 
     [TestMethod]
@@ -124,6 +129,11 @@ namespace FastMapper.UnitTest
       };
 
       Property property = ObjectMapper.Map<Property>(data);
+
+      if(property.NullableInt != 23)
+      {
+        string d = "";
+      }
 
       property.NullableInt.MustEqual(23);
     }
@@ -269,6 +279,26 @@ namespace FastMapper.UnitTest
       properties.First().NullableInt.MustEqual(4);
       properties.Skip(1).First().NullableInt.MustEqual(5);
     }
+
+    /// <summary>
+    /// This test a situation when you have a property with a class and the mapper will create and map that child property with values from the incoming source.
+    /// </summary>
+    [TestMethod]
+    public void Map_maps_properties_of_complex_type_from_source_values()
+    {
+      dynamic data = new
+      {
+        Name = "bob",
+        Address01 = "address-01",
+        PostCode = "post-code"
+      };
+
+      Person person = ObjectMapper.Map<Person>(data);
+
+      person.Name.MustEqual("bob");
+      person.Address.Address01.MustEqual("address-01");
+      person.Address.PostCode.MustEqual("post-code");
+    }
   }
 
   public enum Types
@@ -316,6 +346,13 @@ namespace FastMapper.UnitTest
     public IEnumerable<File> Files { get; set; }
 
     public IEnumerable<IFile> AbstractFiles { get; set; }
+  }
+
+  public class Person
+  {
+    public string Name { get; set; }
+
+    public Address Address { get; set; }
   }
 
   public class Address : IAddress

@@ -31,11 +31,14 @@ namespace System
 
     public static void All(string name, int times, Action action)
     {
-      for (int i = 0; i < times; i++)
+      using (new Profiler($"{name} ({times})"))
       {
-        using (new Profiler($"name ({times})"))
+        for (int i = 0; i < times; i++)
         {
-          action();
+          using (new Profiler($"{name} ({i}/{times})"))
+          {
+            action();
+          }
         }
       }
     }

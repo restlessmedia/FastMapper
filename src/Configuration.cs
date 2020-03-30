@@ -38,6 +38,11 @@ namespace FastMapper
     /// </summary>
     public bool LazyLoad = true;
 
+    public void Clear()
+    {
+      TargetConfigurations.Clear();
+    }
+
     internal static Configuration Current
     {
       get

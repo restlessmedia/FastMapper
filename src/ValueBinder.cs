@@ -29,6 +29,7 @@ namespace FastMapper
     /// Resolves the source name from either the mapping configuration or target member.
     /// </summary>
     /// <param name="targetMember"></param>
+    /// <param name="targetConfiguration"></param>
     /// <returns></returns>
     protected static string GetSourceNameOrDefault(Member targetMember, TargetConfiguration targetConfiguration)
     {

@@ -109,7 +109,7 @@ namespace FastMapper
     {
       if (source == null)
       {
-        return default(TTarget);
+        return default;
       }
 
       Configuration configuration = Configuration.Current;
@@ -149,6 +149,11 @@ namespace FastMapper
       TargetConfiguration<TSource, TTarget> targetConfiguration = GetTargetConfiguration(targetConfigurationFactory);
 
       return MapAll<TTarget>(source, targetConfiguration);
+    }
+
+    public static void ad()
+    {
+
     }
 
     /// <summary>
