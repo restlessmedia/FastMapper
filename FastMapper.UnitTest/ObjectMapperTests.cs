@@ -319,6 +319,21 @@ namespace FastMapper.UnitTest
       person.Address.PostCode.MustEqual("post-code");
       person.WritableField.MustEqual("field-value");
     }
+
+    [TestMethod]
+    public void works_with_member_as_array()
+    {
+      dynamic data = new
+      {
+        Title = "a-title",
+        Address01 = "address-01",
+        PostCode = "PostCode-01"
+      };
+
+      TypeWithArray testInstance = ObjectMapper.Map<TypeWithArray>(data);
+
+      testInstance.Title.MustEqual("a-title");
+    }
   }
 
   public enum Types
@@ -392,5 +407,12 @@ namespace FastMapper.UnitTest
     string Address01 { get; set; }
 
     string PostCode { get; set; }
+  }
+
+  public class TypeWithArray
+  {
+    public string Title { get; set; }
+
+    public Address[] Addresses { get; set; }
   }
 }

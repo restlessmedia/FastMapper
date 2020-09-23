@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FakeItEasy;
 using FastMember;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -41,9 +42,33 @@ namespace FastMapper.UnitTest
       typeAccessor[target, member.Name].MustBeNull();
     }
 
+    [TestMethod]
+    public void binds_to_array()
+    {
+      Configuration configuration = new Configuration();
+      IEnumerableValueBinder valueBinder = new IEnumerableValueBinder(new Configuration());
+      TypeAccessor typeAccessor = TypeAccessor.Create(typeof(TestWithArray));
+      Member member = typeAccessor.GetMembers().First();
+      object source = new
+      {
+        Foo = "a-foo-value"
+      };
+      TestWithArray target = new TestWithArray();
+      ValueBinderContext valueBinderContext = new ValueBinderContext(source, target, A.Fake<TargetConfiguration>(), new DefaultValueProvider(), new ObjectMapper(configuration));
+
+      valueBinder.Bind(typeAccessor, member, valueBinderContext);
+
+      target.Tests[0].Foo.MustEqual("a-foo-value");
+    }
+
     private class Test
     {
       public string Foo { get; set; }
+    }
+
+    private class TestWithArray
+    {
+      public Test[] Tests { get; set; }
     }
   }
 }

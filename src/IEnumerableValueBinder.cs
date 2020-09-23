@@ -12,7 +12,8 @@ namespace FastMapper
 
     public override bool CanBind(Type targetMemberType)
     {
-      return targetMemberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(targetMemberType);
+      // additional check for IsGenericType prevents returning true for string which is ienumerable<char>
+      return (targetMemberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(targetMemberType)) || targetMemberType.IsArray;
     }
 
     public override void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext)
@@ -48,29 +49,33 @@ namespace FastMapper
     /// <returns></returns>
     private static Type FindEnumerableType(Member targetMember, IEnumerable sourceEnumerable, TargetConfiguration targetConfiguration)
     {
-      Type type;
+      Type enumerableType = null;
 
       if (sourceEnumerable != null)
       {
         // we have a source enumerable to loop from
-        type = (sourceEnumerable).GetType();
+        enumerableType = (sourceEnumerable).GetType().GenericTypeArguments.FirstOrDefault();
       }
-      else
+      else if (targetMember.Type.IsGenericType)
       {
-        // we don't have a source enumerable to copy from, try to build up 1 target object from the source data
-        type = targetMember.Type;
+        // the type is generic so get the first generic type i.e. IEnumerable<First>s
+        enumerableType = targetMember.Type.GenericTypeArguments.FirstOrDefault();
       }
-
-      Type enumerableType = type.GenericTypeArguments.FirstOrDefault();
+      else if (targetMember.Type.IsArray)
+      {
+        // we have an array, get the array type i.e ArrayType[]
+        enumerableType = targetMember.Type.GetElementType();
+      }
 
       if (enumerableType != null)
       {
+        // attempt to find a type to use
         if (TryFindResolvedType(enumerableType, targetConfiguration, out Type resolvedType))
         {
           return resolvedType;
         }
-
-        if (!enumerableType.IsAbstract)
+        // we can't map to an abstract type we don't know how to map to
+        else if (!enumerableType.IsAbstract)
         {
           return enumerableType;
         }
