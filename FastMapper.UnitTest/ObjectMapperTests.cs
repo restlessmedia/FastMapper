@@ -334,6 +334,20 @@ namespace FastMapper.UnitTest
 
       testInstance.Title.MustEqual("a-title");
     }
+
+    /// <summary>
+    /// This checks for an issue where we try to map to a primative list i.e. List<string>.
+    /// </summary>
+    [TestMethod]
+    public void primative_list_does_not_throw()
+    {
+      ObjectMapper.Map<TestWithPrimativeList>(new
+      {
+        Title = "a-title",
+        Address01 = "address-01",
+        PostCode = "PostCode-01"
+      });
+    }
   }
 
   public enum Types
@@ -414,5 +428,10 @@ namespace FastMapper.UnitTest
     public string Title { get; set; }
 
     public Address[] Addresses { get; set; }
+  }
+
+  public class TestWithPrimativeList
+  {
+    public IList<string> Notes { get; set; }
   }
 }

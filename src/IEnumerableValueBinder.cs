@@ -21,7 +21,8 @@ namespace FastMapper
       IEnumerable sourceEnumerable = FindSourceEnumerable(valueBinderContext.Source, targetMember, valueBinderContext.TargetConfiguration, valueBinderContext.ValueProvider);
       Type enumerableType = FindEnumerableType(targetMember, sourceEnumerable, valueBinderContext.TargetConfiguration);
 
-      if (enumerableType == null)
+      // if we don't have a type or the type is primative - we can't build an array list of it (prevents error when attempting to map to List<string> and we try and map to string and iterate through it's members)
+      if (enumerableType == null || !IsMappableType(enumerableType))
       {
         return;
       }

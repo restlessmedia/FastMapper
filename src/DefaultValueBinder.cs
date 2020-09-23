@@ -30,31 +30,11 @@ namespace FastMapper
           value = valueConverter.Convert(value, targetMember.Type);
           targetAccessor[valueBinderContext.Result, targetMember.Name] = value;
         }
-        else if (CanMap(targetMember.Type))
+        else if (IsMappableType(targetMember.Type))
         {
           targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.Map(targetMember.Type, valueBinderContext.Source);
         }
       }
-    }
-
-    /// <summary>
-    /// Returns true if we can map to the specific type i.e it's not a string or primative type
-    /// </summary>
-    /// <param name="type"></param>
-    /// <returns></returns>
-    private bool CanMap(Type type)
-    {
-      if (type.IsPrimitive)
-      {
-        return false;
-      }
-
-      if(type == typeof(string))
-      {
-        return false;
-      }
-
-      return type.IsClass;
     }
   }
 }

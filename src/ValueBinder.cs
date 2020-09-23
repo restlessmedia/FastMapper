@@ -78,6 +78,26 @@ namespace FastMapper
       return resolvedType != null;
     }
 
+    /// <summary>
+    /// Returns true if we can map to the specific type i.e it's not a string or primative type
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    protected bool IsMappableType(Type type)
+    {
+      if (type.IsPrimitive)
+      {
+        return false;
+      }
+
+      if (type == typeof(string))
+      {
+        return false;
+      }
+
+      return type.IsClass;
+    }
+
     protected readonly Configuration Configuration;
   }
 }
