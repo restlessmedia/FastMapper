@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace FastMapper
 {
@@ -35,7 +36,7 @@ namespace FastMapper
       object result = targetAccessor.CreateNew();
       ValueBinderContext valueBinderContext = new ValueBinderContext(source, result, targetConfiguration, valueProvider, this);
 
-      foreach (Member targetMember in targetAccessor.GetMembers().Where(x => x.CanWrite))
+      foreach (Member targetMember in GetWritableMembers(type, targetAccessor))
       {
         ValueBinder valueBinder = _configuration.ValueBinders.First(x => x.CanBind(targetMember.Type));
         valueBinder.Bind(targetAccessor, targetMember, valueBinderContext);
@@ -151,11 +152,6 @@ namespace FastMapper
       return MapAll<TTarget>(source, targetConfiguration);
     }
 
-    public static void ad()
-    {
-
-    }
-
     /// <summary>
     /// If a factory is passed will look for existing configurations or create a new one then invoke.
     /// </summary>
@@ -186,6 +182,46 @@ namespace FastMapper
       }
 
       return targetConfiguration;
+    }
+
+    /// <summary>
+    /// Returns a colleciton of <see cref="Member"/>s that can be written to.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="targetAccessor"></param>
+    /// <returns></returns>
+    private static IEnumerable<Member> GetWritableMembers(Type type, TypeAccessor targetAccessor)
+    {
+      return targetAccessor.GetMembers().Where(member =>
+      {
+        try
+        {
+          return member.CanWrite;
+        }
+        catch (NotSupportedException)
+        {
+          // fastmember throws invalid for fields but they can be written to.
+          // here we'll check the underlying type to find out if it can be written to.
+          MemberInfo memberInfo = type.GetMember(member.Name).FirstOrDefault();
+
+          if (memberInfo != null)
+          {
+            switch (memberInfo.MemberType)
+            {
+              case MemberTypes.Field:
+                {
+                  return !((FieldInfo)memberInfo).IsInitOnly;
+                }
+              case MemberTypes.Property:
+                {
+                  return !((PropertyInfo)memberInfo).CanWrite;
+                }
+            }
+          }
+
+          return false;
+        }
+      });
     }
 
     private readonly Configuration _configuration;

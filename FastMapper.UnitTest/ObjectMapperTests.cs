@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FastMember;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -299,6 +300,25 @@ namespace FastMapper.UnitTest
       person.Address.Address01.MustEqual("address-01");
       person.Address.PostCode.MustEqual("post-code");
     }
+
+    [TestMethod]
+    public void works_with_fields()
+    {
+      dynamic data = new
+      {
+        Name = "bob",
+        Address01 = "address-01",
+        PostCode = "post-code",
+        WritableField = "field-value"
+      };
+
+      PersonWithField person = ObjectMapper.Map<PersonWithField>(data);
+
+      person.Name.MustEqual("bob");
+      person.Address.Address01.MustEqual("address-01");
+      person.Address.PostCode.MustEqual("post-code");
+      person.WritableField.MustEqual("field-value");
+    }
   }
 
   public enum Types
@@ -353,6 +373,11 @@ namespace FastMapper.UnitTest
     public string Name { get; set; }
 
     public Address Address { get; set; }
+  }
+
+  public class PersonWithField : Person
+  {
+    public string WritableField;
   }
 
   public class Address : IAddress
