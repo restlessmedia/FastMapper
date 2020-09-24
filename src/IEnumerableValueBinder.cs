@@ -31,12 +31,12 @@ namespace FastMapper
       if (sourceEnumerable != null)
       {
         // we have a source enumerable we need to convert to target enumerable
-        value = valueBinderContext.ObjectMapper.MapAll(enumerableType, sourceEnumerable, member: targetMember);
+        value = valueBinderContext.ObjectMapper.MapAll(enumerableType, sourceEnumerable, declaringMember: targetMember);
       }
       else
       {
         // otherwise we create an array with a single entry where we've mapped from the original object and set the value to that
-        value = valueBinderContext.ObjectMapper.Map(enumerableType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
+        value = valueBinderContext.ObjectMapper.Map(enumerableType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, declaringMember: targetMember);
         ArrayList list = new ArrayList { value };
         value = list.ToArray(enumerableType);
       }

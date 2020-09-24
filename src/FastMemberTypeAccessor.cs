@@ -13,7 +13,6 @@ namespace FastMapper
     {
       _type = type;
       _typeAccessor = TypeAccessor.Create(type);
-      _members = _typeAccessor.GetMembers().Select(member => new FastMapperMember(type, member)).ToArray();
     }
 
     public object CreateInstance()
@@ -23,7 +22,7 @@ namespace FastMapper
 
     public IEnumerable<IMember> GetMembers()
     {
-      return _members;
+      return _typeAccessor.GetMembers().Select(member => new FastMapperMember(_type, member));
     }
 
     public object GetValue(object obj, string name)
@@ -123,7 +122,5 @@ namespace FastMapper
     private readonly Type _type;
 
     private readonly TypeAccessor _typeAccessor;
-
-    private readonly FastMapperMember[] _members;
   }
 }

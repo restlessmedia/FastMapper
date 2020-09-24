@@ -5,8 +5,8 @@ namespace FastMapper
 {
   public interface IObjectMapper
   {
-    object Map(Type type, object source, TargetConfiguration targetConfiguration = null, ValueProvider valueProvider = null, IMember member = null);
+    object Map(Type type, object source, TargetConfiguration targetConfiguration = null, ValueProvider valueProvider = null, IMember declaringMember = null);
 
-    IEnumerable MapAll(Type type, IEnumerable sources, TargetConfiguration targetConfiguration = null, IMember member = null); 
+    IEnumerable MapAll(Type type, IEnumerable sources, TargetConfiguration targetConfiguration = null, IMember declaringMember = null); 
   }
 }

@@ -19,7 +19,7 @@ namespace FastMapper
 
       if (TryFindResolvedType(targetMember.Type, valueBinderContext.TargetConfiguration, out Type resolvedType))
       {
-        value = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
+        value = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, declaringMember: targetMember);
       }
       else
       {
@@ -32,7 +32,7 @@ namespace FastMapper
         }
         else if (IsMappableType(targetMember.Type))
         {
-          value = valueBinderContext.ObjectMapper.Map(targetMember.Type, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
+          value = valueBinderContext.ObjectMapper.Map(targetMember.Type, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, declaringMember: targetMember);
         }
         else
         {
