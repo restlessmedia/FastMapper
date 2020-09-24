@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
-using FastMember;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FastMapper.UnitTest
@@ -31,15 +30,15 @@ namespace FastMapper.UnitTest
     public void does_not_bind_when_concrete_enumerable_type_cannot_be_found()
     {
       IEnumerableValueBinder valueBinder = new IEnumerableValueBinder(new Configuration());
-      TypeAccessor typeAccessor = TypeAccessor.Create(typeof(Test));
-      Member member = typeAccessor.GetMembers().First();
+      ITypeAccessor typeAccessor = TypeAccessorFactory.Create(typeof(Test));
+      IMember member = typeAccessor.GetMembers().First();
       object source = new { };
       Test target = new Test();
       ValueBinderContext valueBinderContext = CreateContext(source, target);
 
       valueBinder.Bind(typeAccessor, member, valueBinderContext);
 
-      typeAccessor[target, member.Name].MustBeNull();
+      typeAccessor.GetValue(target, member.Name).MustBeNull();
     }
 
     [TestMethod]
@@ -47,8 +46,8 @@ namespace FastMapper.UnitTest
     {
       Configuration configuration = new Configuration();
       IEnumerableValueBinder valueBinder = new IEnumerableValueBinder(new Configuration());
-      TypeAccessor typeAccessor = TypeAccessor.Create(typeof(TestWithArray));
-      Member member = typeAccessor.GetMembers().First();
+      ITypeAccessor typeAccessor = TypeAccessorFactory.Create(typeof(TestWithArray));
+      IMember member = typeAccessor.GetMembers().First();
       object source = new
       {
         Foo = "a-foo-value"

@@ -1,5 +1,4 @@
-﻿using FastMember;
-using System;
+﻿using System;
 using System.Collections;
 using System.Linq;
 
@@ -16,7 +15,7 @@ namespace FastMapper
       return (targetMemberType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(targetMemberType)) || targetMemberType.IsArray;
     }
 
-    public override void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext)
+    public override void Bind(ITypeAccessor targetAccessor, IMember targetMember, ValueBinderContext valueBinderContext)
     {
       IEnumerable sourceEnumerable = FindSourceEnumerable(valueBinderContext.Source, targetMember, valueBinderContext.TargetConfiguration, valueBinderContext.ValueProvider);
       Type enumerableType = FindEnumerableType(targetMember, sourceEnumerable, valueBinderContext.TargetConfiguration);
@@ -27,18 +26,22 @@ namespace FastMapper
         return;
       }
 
+      object value;
+
       if (sourceEnumerable != null)
       {
         // we have a source enumerable we need to convert to target enumerable
-        targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.MapAll(enumerableType, sourceEnumerable, valueBinderContext.TargetConfiguration);
+        value = valueBinderContext.ObjectMapper.MapAll(enumerableType, sourceEnumerable, member: targetMember);
       }
       else
       {
         // otherwise we create an array with a single entry where we've mapped from the original object and set the value to that
-        object value = valueBinderContext.ObjectMapper.Map(enumerableType, valueBinderContext.Source, valueBinderContext.ValueProvider, valueBinderContext.TargetConfiguration);
+        value = valueBinderContext.ObjectMapper.Map(enumerableType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
         ArrayList list = new ArrayList { value };
-        targetAccessor[valueBinderContext.Result, targetMember.Name] = list.ToArray(enumerableType);
+        value = list.ToArray(enumerableType);
       }
+
+      targetAccessor.SetValue(valueBinderContext.Result, targetMember.Name, value);
     }
 
     /// <summary>
@@ -48,7 +51,7 @@ namespace FastMapper
     /// <param name="sourceEnumerable"></param>
     /// <param name="targetConfiguration"></param>
     /// <returns></returns>
-    private static Type FindEnumerableType(Member targetMember, IEnumerable sourceEnumerable, TargetConfiguration targetConfiguration)
+    private static Type FindEnumerableType(IMember targetMember, IEnumerable sourceEnumerable, TargetConfiguration targetConfiguration)
     {
       Type enumerableType = null;
 
@@ -93,7 +96,7 @@ namespace FastMapper
     /// <param name="targetConfiguration"></param>
     /// <param name="valueProvider"></param>
     /// <returns></returns>
-    private static IEnumerable FindSourceEnumerable(object source, Member targetMember, TargetConfiguration targetConfiguration, ValueProvider valueProvider)
+    private static IEnumerable FindSourceEnumerable(object source, IMember targetMember, TargetConfiguration targetConfiguration, ValueProvider valueProvider)
     {
       string name = GetSourceNameOrDefault(targetMember, targetConfiguration);
 

@@ -1,5 +1,4 @@
-﻿using FastMember;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace FastMapper
@@ -14,27 +13,34 @@ namespace FastMapper
       return true;
     }
 
-    public override void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext)
+    public override void Bind(ITypeAccessor targetAccessor, IMember targetMember, ValueBinderContext valueBinderContext)
     {
+      object value;
+
       if (TryFindResolvedType(targetMember.Type, valueBinderContext.TargetConfiguration, out Type resolvedType))
       {
-        targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueBinderContext.TargetConfiguration);
+        value = valueBinderContext.ObjectMapper.Map(resolvedType, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
       }
       else
       {
         string name = GetSourceNameOrDefault(targetMember, valueBinderContext.TargetConfiguration);
 
-        if (valueBinderContext.ValueProvider.TryGetValue(valueBinderContext.Source, name, out object value) && value != null)
+        if (valueBinderContext.ValueProvider.TryGetValue(valueBinderContext.Source, name, out value) && value != null)
         {
           ValueConverter valueConverter = Configuration.ValueConverters.First(x => x.CanConvert(targetMember.Type));
           value = valueConverter.Convert(value, targetMember.Type);
-          targetAccessor[valueBinderContext.Result, targetMember.Name] = value;
         }
         else if (IsMappableType(targetMember.Type))
         {
-          targetAccessor[valueBinderContext.Result, targetMember.Name] = valueBinderContext.ObjectMapper.Map(targetMember.Type, valueBinderContext.Source);
+          value = valueBinderContext.ObjectMapper.Map(targetMember.Type, valueBinderContext.Source, valueProvider: valueBinderContext.ValueProvider, member: targetMember);
+        }
+        else
+        {
+          return;
         }
       }
+
+      targetAccessor.SetValue(valueBinderContext.Result, targetMember, value);
     }
   }
 }
