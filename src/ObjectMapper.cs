@@ -119,7 +119,7 @@ namespace FastMapper
     {
       if (source == null)
       {
-        return default;
+        return default(TTarget);
       }
 
       TargetConfiguration<TSource, TTarget> targetConfiguration = GetTargetConfiguration(targetConfigurationFactory);
@@ -138,7 +138,7 @@ namespace FastMapper
     {
       if (source == null)
       {
-        return default;
+        return default(TTarget);
       }
 
       Configuration configuration = Configuration.Current;
