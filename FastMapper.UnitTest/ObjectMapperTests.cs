@@ -1,5 +1,4 @@
-﻿using FastMember;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -348,6 +347,18 @@ namespace FastMapper.UnitTest
         PostCode = "PostCode-01"
       });
     }
+
+    [TestMethod]
+    public void nested_or_circulare_references()
+    {
+      Office office = ObjectMapper.Map<Office>(new
+      {
+        OfficeName = "office-1",
+        BranchName = "branch-1"
+      });
+
+      var f = office;
+    }
   }
 
   public enum Types
@@ -433,5 +444,17 @@ namespace FastMapper.UnitTest
   public class TestWithPrimativeList
   {
     public IList<string> Notes { get; set; }
+  }
+
+  public class Branch
+  {
+    public string BranchName;
+    public Office Office;
+  }
+
+  public class Office
+  {
+    public string OfficeName;
+    public Branch Branch;
   }
 }

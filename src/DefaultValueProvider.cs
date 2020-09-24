@@ -1,4 +1,4 @@
-﻿using FastMember;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace FastMapper
@@ -12,9 +12,9 @@ namespace FastMapper
 
     public override bool TryGetValue(object source, string name, out object value)
     {
-      TypeAccessor sourceAccessor = TypeAccessor.Create(source.GetType());
-      MemberSet sourceMembers = sourceAccessor.GetMembers();
-      Member sourceMember = sourceMembers.FirstOrDefault(x => x.CanRead && string.Equals(x.Name, name));
+      ITypeAccessor sourceAccessor = TypeAccessorFactory.Create(source.GetType());
+      IEnumerable<IMember> sourceMembers = sourceAccessor.GetMembers();
+      IMember sourceMember = sourceMembers.FirstOrDefault(x => x.CanRead && string.Equals(x.Name, name));
       value = null;
 
       if (sourceMember == null)
@@ -22,7 +22,7 @@ namespace FastMapper
         return false;
       }
 
-      value = sourceAccessor[source, name];
+      value = sourceAccessor.GetValue(source, name);
 
       return true;
     }

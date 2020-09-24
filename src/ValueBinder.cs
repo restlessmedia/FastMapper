@@ -1,5 +1,4 @@
-﻿using FastMember;
-using System;
+﻿using System;
 
 namespace FastMapper
 {
@@ -23,7 +22,7 @@ namespace FastMapper
 
     public abstract bool CanBind(Type targetMemberType);
 
-    public abstract void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext);
+    public abstract void Bind(ITypeAccessor targetAccessor, IMember targetMember, ValueBinderContext valueBinderContext);
 
     /// <summary>
     /// Resolves the source name from either the mapping configuration or target member.
@@ -31,7 +30,7 @@ namespace FastMapper
     /// <param name="targetMember"></param>
     /// <param name="targetConfiguration"></param>
     /// <returns></returns>
-    protected static string GetSourceNameOrDefault(Member targetMember, TargetConfiguration targetConfiguration)
+    protected static string GetSourceNameOrDefault(IMember targetMember, TargetConfiguration targetConfiguration)
     {
       if (targetConfiguration != null)
       {

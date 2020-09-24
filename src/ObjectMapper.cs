@@ -1,9 +1,7 @@
-﻿using FastMember;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace FastMapper
 {
@@ -14,30 +12,47 @@ namespace FastMapper
       _configuration = configuration;
     }
 
-    public object Map(Type type, object source, TargetConfiguration targetConfiguration = null)
+    /// <summary>
+    /// Maps the given <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type to map</param>
+    /// <param name="source">The source to map from</param>
+    /// <param name="targetConfiguration">Configuration to use</param>
+    /// <param name="valueProvider">Value provider to use</param>
+    /// <param name="declaringMember">The declaring member if this is type is being mapped from a declaring member</param>
+    /// <returns></returns>
+    public object Map(Type type, object source, TargetConfiguration targetConfiguration = null, ValueProvider valueProvider = null, IMember declaringMember = null)
     {
       if (source == null)
       {
         return null;
       }
 
-      ValueProvider valueProvider = _configuration.ValueProviders.First(x => x.CanRead(source));
-      return Map(type, source, valueProvider, targetConfiguration);
-    }
+      ITypeAccessor targetAccessor = TypeAccessorFactory.Create(type);
+      object result = targetAccessor.CreateInstance();
 
-    public object Map(Type type, object source, ValueProvider valueProvider, TargetConfiguration targetConfiguration)
-    {
-      if (source == null)
+      // get config for the target type if not provided
+      if (targetConfiguration == null)
       {
-        return null;
+        _configuration.TargetConfigurations.TryGetValue(type, out targetConfiguration);
       }
 
-      TypeAccessor targetAccessor = TypeAccessor.Create(type);
-      object result = targetAccessor.CreateNew();
+      // get the value provider if not provided
+      if (valueProvider == null)
+      {
+        valueProvider = _configuration.ValueProviders.First(x => x.CanRead(source));
+      }
+
       ValueBinderContext valueBinderContext = new ValueBinderContext(source, result, targetConfiguration, valueProvider, this);
 
-      foreach (Member targetMember in GetWritableMembers(type, targetAccessor))
+      foreach (IMember targetMember in targetAccessor.GetMembers())
       {
+        // recursion protection - if we are calling this bind from a member and attempt to bind to a target with the same type, continue to next target member
+        if (declaringMember != null && targetMember.Type == declaringMember.DeclaringType)
+        {
+          continue;
+        }
+
         ValueBinder valueBinder = _configuration.ValueBinders.First(x => x.CanBind(targetMember.Type));
         valueBinder.Bind(targetAccessor, targetMember, valueBinderContext);
       }
@@ -45,19 +60,31 @@ namespace FastMapper
       return result;
     }
 
-    public IEnumerable MapAll(Type type, IEnumerable source, TargetConfiguration targetConfiguration = null)
+    /// <summary>
+    /// Maps all the given <paramref name="type"/>s from the <paramref name="sources"/>.
+    /// </summary>
+    /// <param name="type">The type to map</param>
+    /// <param name="sources">The source to map from</param>
+    /// <param name="targetConfiguration">Configuration to use</param>
+    /// <param name="declaringMember">The declaring member if this is type is being mapped from a declaring member</param>
+    /// <returns></returns>
+    public IEnumerable MapAll(Type type, IEnumerable sources, TargetConfiguration targetConfiguration = null, IMember declaringMember = null)
     {
-      if (source == null)
+      if (sources == null)
       {
         yield return null;
       }
 
-      foreach (object obj in source)
+      foreach (object obj in sources)
       {
-        yield return Map(type, obj, targetConfiguration);
+        yield return Map(type, obj, targetConfiguration, declaringMember: declaringMember);
       }
     }
 
+    /// <summary>
+    /// Initialisation routine with callback contains the <see cref="Configuration"/>.
+    /// </summary>
+    /// <param name="action"></param>
     public static void Init(Action<Configuration> action)
     {
       Configuration configuration = Configuration.Current;
@@ -71,11 +98,11 @@ namespace FastMapper
           foreach (TypeResolver typeResolver in configuration.TargetConfigurations[targetType].GetTypeResolvers())
           {
             // preload the resolved types
-            TypeAccessor.Create(typeResolver.ResolvedType);
+            TypeAccessorFactory.Create(typeResolver.ResolvedType);
           }
 
           // preload the target types
-          TypeAccessor.Create(targetType);
+          TypeAccessorFactory.Create(targetType);
         }
       }
     }
@@ -86,6 +113,7 @@ namespace FastMapper
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TTarget"></typeparam>
     /// <param name="source"></param>
+    /// <param name="targetConfigurationFactory"></param>
     /// <returns></returns>
     public static TTarget Map<TSource, TTarget>(TSource source, Action<TargetConfiguration<TSource, TTarget>> targetConfigurationFactory = null)
     {
@@ -117,11 +145,6 @@ namespace FastMapper
       Type targetType = typeof(TTarget);
       IObjectMapper objectMapper = new ObjectMapper(configuration);
 
-      if (targetConfiguration == null)
-      {
-        configuration.TargetConfigurations.TryGetValue(targetType, out targetConfiguration);
-      }
-
       return (TTarget)objectMapper.Map(targetType, source, targetConfiguration);
     }
 
@@ -129,27 +152,35 @@ namespace FastMapper
     /// Maps all sources to target type.
     /// </summary>
     /// <typeparam name="TTarget"></typeparam>
-    /// <param name="source"></param>
+    /// <param name="sources"></param>
     /// <param name="targetConfiguration"></param>
     /// <returns></returns>
-    public static IEnumerable<TTarget> MapAll<TTarget>(IEnumerable source, TargetConfiguration targetConfiguration = null)
+    public static IEnumerable<TTarget> MapAll<TTarget>(IEnumerable sources, TargetConfiguration targetConfiguration = null)
     {
-      foreach (object obj in source)
+      foreach (object source in sources)
       {
-        yield return Map<TTarget>(obj, targetConfiguration);
+        yield return Map<TTarget>(source, targetConfiguration);
       }
     }
 
-    public static IEnumerable<TTarget> MapAll<TSource, TTarget>(IEnumerable source, Action<TargetConfiguration<TSource, TTarget>> targetConfigurationFactory = null)
+    /// <summary>
+    /// Maps all sources to target type.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TTarget"></typeparam>
+    /// <param name="sources"></param>
+    /// <param name="targetConfigurationFactory"></param>
+    /// <returns></returns>
+    public static IEnumerable<TTarget> MapAll<TSource, TTarget>(IEnumerable sources, Action<TargetConfiguration<TSource, TTarget>> targetConfigurationFactory = null)
     {
-      if (source == null)
+      if (sources == null)
       {
         return Enumerable.Empty<TTarget>();
       }
 
       TargetConfiguration<TSource, TTarget> targetConfiguration = GetTargetConfiguration(targetConfigurationFactory);
 
-      return MapAll<TTarget>(source, targetConfiguration);
+      return MapAll<TTarget>(sources, targetConfiguration);
     }
 
     /// <summary>
@@ -182,46 +213,6 @@ namespace FastMapper
       }
 
       return targetConfiguration;
-    }
-
-    /// <summary>
-    /// Returns a colleciton of <see cref="Member"/>s that can be written to.
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="targetAccessor"></param>
-    /// <returns></returns>
-    private static IEnumerable<Member> GetWritableMembers(Type type, TypeAccessor targetAccessor)
-    {
-      return targetAccessor.GetMembers().Where(member =>
-      {
-        try
-        {
-          return member.CanWrite;
-        }
-        catch (NotSupportedException)
-        {
-          // fastmember throws invalid for fields but they can be written to.
-          // here we'll check the underlying type to find out if it can be written to.
-          MemberInfo memberInfo = type.GetMember(member.Name).FirstOrDefault();
-
-          if (memberInfo != null)
-          {
-            switch (memberInfo.MemberType)
-            {
-              case MemberTypes.Field:
-                {
-                  return !((FieldInfo)memberInfo).IsInitOnly;
-                }
-              case MemberTypes.Property:
-                {
-                  return !((PropertyInfo)memberInfo).CanWrite;
-                }
-            }
-          }
-
-          return false;
-        }
-      });
     }
 
     private readonly Configuration _configuration;

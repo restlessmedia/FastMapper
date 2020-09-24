@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using FakeItEasy;
-using FastMember;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace FastMapper.UnitTest
@@ -16,8 +15,8 @@ namespace FastMapper.UnitTest
       {
         Configuration configuration = new Configuration();
         TestBinder binder = new TestBinder(configuration);
-        TypeAccessor typeAccessor = TypeAccessor.Create(typeof(Test));
-        Member member = typeAccessor.GetMembers().First();
+        ITypeAccessor typeAccessor = TypeAccessorFactory.Create(typeof(Test));
+        IMember member = typeAccessor.GetMembers().First();
 
         binder.Bind(typeAccessor, member, CreateContext(null));
       }
@@ -34,7 +33,7 @@ namespace FastMapper.UnitTest
         {
         }
 
-        public override void Bind(TypeAccessor targetAccessor, Member targetMember, ValueBinderContext valueBinderContext)
+        public override void Bind(ITypeAccessor targetAccessor, IMember targetMember, ValueBinderContext valueBinderContext)
         {
           GetSourceNameOrDefault(targetMember, valueBinderContext.TargetConfiguration);
         }
